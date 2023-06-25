@@ -1,0 +1,11 @@
+[Unit]
+Description=Users api
+
+[Service]
+User=root
+WorkingDirectory=/home/ubuntu/users-api
+ExecStart=sh /home/ubuntu/users-api/start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
