@@ -8,7 +8,8 @@ const db = pgp(process.env.DB_URL || 'postgres://postgres:postgres@127.0.0.1:543
 
 db.query('CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name VARCHAR(255), email VARCHAR(255))')
     .then(() => {
-        console.log('DB Connection success and the init Table created')
+        console.log('DB Connection success')
+        console.log(`Initial Table creation if not exists success`)
     })
     .catch((error) => {
         console.log(error)
@@ -28,12 +29,12 @@ app.get('/users/:id', async (req, res) => {
     res.json(user)
 })
 
-app.get('/users/search/:name', async (req, res) => {
+app.get('/users/search/name/:name', async (req, res) => {
     const users = await db.any('SELECT * FROM users WHERE name LIKE $1', [`%${req.params.name}%`])
     res.json(users)
 })
 
-app.get('/users/search/:email', async (req, res) => {
+app.get('/users/search/email/:email', async (req, res) => {
     const users = await db.any('SELECT * FROM users WHERE email LIKE $1', [`%${req.params.email}%`])
     res.json(users)
 })
@@ -56,5 +57,5 @@ app.delete('/users/:id', async (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`users-api listening on port ${port}`)
 })
