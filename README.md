@@ -1,5 +1,8 @@
 # users-api
 
+Steps to run this application on a Linux VM.
+> This example are taken from a ubuntu vm. If you are not using a ubuntu vm , make sure you change the necessary path, commond in the below example.
+
 ```bash
 git clone https://github.com/samit-maersk/users-api.git
 
