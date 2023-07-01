@@ -23,7 +23,7 @@ const userNamePassword = () => {
 db.query('CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name VARCHAR(255), email VARCHAR(255))')
     .then(() => {
         console.log('DB Connection success')
-        console.log(`Initial Table creation if not exists success`)
+        console.log(`Initial Table creation if not exists - success`)
     })
     .catch((error) => {
         console.log(error)
@@ -33,7 +33,12 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 
-//TODO fix this
+const myLogger = function (req, res, next) {
+  console.log(`${req.method} ${req.url} ${req.headers['user-agent']} `)
+  next()
+}
+app.use(myLogger)
+
 function validateToken (req, res, next) {
     console.log(`${req.method} ${req.originalUrl}`)
     const authHeader = req.headers.authorization
@@ -41,9 +46,8 @@ function validateToken (req, res, next) {
         const {password} = userNamePassword();
         const token = authHeader.split(' ')[1]
         jwt.verify(token, password, (err, user) => {
-            if (err) {
-                return res.sendStatus(403)
-            } 
+            if (err) return res.sendStatus(403)
+            req.user = user
             next()
         })
     } else {
@@ -51,7 +55,7 @@ function validateToken (req, res, next) {
     }
 }
 
-app.post('/login', async (req, res) => {
+app.post('/login', async (req, res, next) => {
     const { username, password } = userNamePassword();
     if (username && password) {
         if (req.body.username === username && req.body.password === password) {
@@ -65,37 +69,37 @@ app.post('/login', async (req, res) => {
     }
 })
 
-app.get('/users', async (req, res) => {
+app.get('/users', validateToken , async (req, res, next) => {
     const users = await db.any('SELECT * FROM users')
     res.json(users)
 })
 
-app.get('/users/:id', async (req, res) => {
+app.get('/users/:id', validateToken , async (req, res, next) => {
     const user = await db.one('SELECT * FROM users WHERE id = $1', [req.params.id])
     res.json(user)
 })
 
-app.get('/users/search/name/:name', async (req, res) => {
+app.get('/users/search/name/:name', validateToken , async (req, res, next) => {
     const users = await db.any('SELECT * FROM users WHERE name LIKE $1', [`%${req.params.name}%`])
     res.json(users)
 })
 
-app.get('/users/search/email/:email', async (req, res) => {
+app.get('/users/search/email/:email', validateToken , async (req, res, next) => {
     const users = await db.any('SELECT * FROM users WHERE email LIKE $1', [`%${req.params.email}%`])
     res.json(users)
 })
 
-app.post('/users', async (req, res) => {
+app.post('/users', validateToken , async (req, res, next) => {
     const user = await db.one('INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *', [req.body.name, req.body.email])
     res.json(user)
 })
 
-app.put('/users/:id', async (req, res) => {
+app.put('/users/:id', validateToken , async (req, res, next) => {
     const user = await db.one('UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *', [req.body.name, req.body.email, req.params.id])
     res.json(user)
 })
 
-app.delete('/users/:id', async (req, res) => {
+app.delete('/users/:id', validateToken , async (req, res, next) => {
     const user = await db.one('DELETE FROM users WHERE id = $1 RETURNING *', [req.params.id])
     res.json(user)
 })
