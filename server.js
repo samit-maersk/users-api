@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 
 const myLogger = function (req, res, next) {
-  console.log(`${req.method} ${req.url} ${req.headers['user-agent']} `)
+  console.log(`${req.method} ${req.url} ${res.statusCode} `)/*${req.headers['user-agent']}*/
   next()
 }
 app.use(myLogger)
