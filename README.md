@@ -23,8 +23,8 @@ vi start.sh
 sudo cp usersapi.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
-sudo systemctl start postgresapi.service
-sudo systemctl status postgresapi.service
-sudo systemctl enable postgresapi.service
+sudo systemctl start usersapi.service
+sudo systemctl status usersapi.service
+sudo systemctl enable usersapi.service
 
 ```
